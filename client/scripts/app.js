@@ -3,15 +3,17 @@
 var app = {
   server: 'https://api.parse.com/1/classes/messages',
   results: [],
-  rooms: {'lobby': 'lobby'},
+  rooms: {},
   currentRoom: 'lobby'
-
 };
   
 app.displayMessages = function(data) {
 
   var $chats = $('#chats');
   var context = this;
+
+  //empty chats
+  $('#chats').empty();
 
   data.forEach(function(element) { //WHY IS UNDERSCORE NOT WORKING?
 
@@ -25,19 +27,21 @@ app.displayMessages = function(data) {
     var safeUsername = context.escapeForHtml(username);
     var safeRoomname = context.escapeForHtml(roomname);
 
-    var temp = '<div class="chat"> ' +
-          '<div class="username">' + safeUsername + '</div>' +
-          '<div>' + safeText + '</div>' + '\n' + 
-          '<div>' + safeCreatedAt + '</div>' +
-          '</div>';    
+    if (safeRoomname === context.currentRoom) {
 
-    $chats.append(temp);
+      var temp = '<div class="chat"> ' +
+            '<div class="username">' + safeUsername + '</div>' +
+            '<div>' + safeText + '</div>' + '\n' + 
+            '<div>' + safeCreatedAt + '</div>' +
+            '</div>';    
+
+      $chats.append(temp);
+
+    }
 
     context.rooms[safeRoomname] = safeRoomname;
-  });
-  console.log(context.rooms);
 
-  //FILTER RESULT BY ROOM
+  });
 
 };
 
@@ -69,8 +73,11 @@ app.escapeForHtml = function(string) {
 };
 
 app.init = function() {
+
+  var context = this;
   $('.clearButton').on('click', app.clearMessages);
   $('.addButton').on('click', app.addMessage);
+
   $('select[name="roomDropDown"]').on('change', function(event) {
     if ($(this).val() === 'addNewRoom') {
       $('.add-room-container').toggleClass('hidden');
@@ -79,9 +86,16 @@ app.init = function() {
       //display messages for that room
       //allow user to add message to that room
       //fetch for room
+      context.currentRoom = $(this).val();
+      app.fetch();
     }
   });
-  $('.addRoomButton').on('click', app.addRoom);
+
+  $('.addRoomButton').on('click', function() {
+    var room = $('input[name="addRoom"]').val();
+    app.addRoom(room);
+  });
+
 };
 
 app.send = function(message) {
@@ -99,9 +113,6 @@ app.send = function(message) {
       console.error('chatterbox: Failed to send message', data);
     }
   });
-
-
-
 };
 
 
@@ -117,10 +128,7 @@ app.fetch = function() {
     contentType: 'application/json',
     success: function (data) {
       this.results = data.results;
-
-     // $('#chats').append(JSON.stringify(data.results.createdAt));
-      context.displayMessages(data.results);
-
+      context.displayMessages(data.results);å
       console.log('chatterbox: Message received');
     },
     error: function (data) {
@@ -133,57 +141,59 @@ app.fetch = function() {
 
 app.clearMessages = function() {
   // get the chat html element using jQuery
-  console.log('in clearMessages function');
   var $chats = $('#chats');
   $chats.empty();
-  // empty it
-
 };
 
 app.addMessage = function(message) {
+  //EXAMPLE
+  // {"createdAt":"2016-03-15T02:23:13.246Z", *
+  // "objectId":"1WMVP1XR0i", *
+  // "roomname":"stuff",
+  // "text":"Hello @Rahim",
+  // "updatedAt":"2016-03-15T02:23:13.246Z", *
+  // "username":"therealdonald"}
+
+  //Grab message from input box
   var text = app.escapeForHtml($('input[name="add"]').val());
 
-  //create object from input, use JSON.stringify
-  //send to server
-
-// {"createdAt":"2016-03-15T02:23:13.246Z", *
-// "objectId":"1WMVP1XR0i", *
-// "roomname":"stuff",
-// "text":"Hello @Rahim",
-// "updatedAt":"2016-03-15T02:23:13.246Z", *
-// "username":"therealdonald"}
-
+  //Get username
   var queryString = window.location.search;  
-
   var userString = app.escapeForHtml(queryString.split('=')[1]);  // TODO - create more robust solution to find username
-  var roomname = 'lobby';   // TODO create dropdown for room value;
 
+  //Compile message
   var message = {
     username: userString,
-    roomname: roomname,
+    roomname: app.currentRoom,
     text: text
   };
 
   console.log("message = " + message);
 
+  //add to DOM, send, do not refresh page
+
+  var newChat = $('#chats').prepend('<div class="chat"> ' +
+            '<div class="username">' + userString + '</div>' +
+            '<div>' + text + '</div>' + '\n' + 
+            '<div>' + new Date() + '</div>' +
+            '</div>');  
+  
+
   app.send(message);
 
-  app.clearMessages();
-
-  app.fetch();
-
+  //app.clearMessages();
+  //app.fetch();
   console.log("Inside addMessage: " + text);
 
 };
 
-app.addRoom = function() {
+app.addRoom = function(room) {
 
   //get value from input field
   // protect user input from bad stuff being entered
-  var roomname = app.escapeForHtml($('input[name="addRoom"]').val());
+  var roomname = app.escapeForHtml(room);
   //add to rooms object
   app.rooms[roomname] = roomname;
-  console.log(roomname);
   //refresh dropdown with rooms object
   //delete old options
   $('select[name="roomDropDown"]').empty();
@@ -192,11 +202,11 @@ app.addRoom = function() {
     text: 'Add New Room',
     value: 'addNewRoom' 
   }));
-  
+
+  app.currentRoom = roomname;  
 
   $.each(app.rooms, function(index, value) {
     if (value === roomname) {
-      //console.log("ROOMNAME == value");
       $('select').append($('<option/>', {
         text: value,
         value: value ,
@@ -209,27 +219,14 @@ app.addRoom = function() {
       }));  
     }
   });
-  //fetch messages for room
 
-  //add to dropdown list
-  // add new room value to rooms object in app
-  // navigate to room, fetch for that room
+  //fetch messages for room
+  app.fetch();
 
   $('.add-room-container').toggleClass('hidden');
 };
 
-
-var message = {
-  username: 'Mel Brooks',
-  text: 'It\'s good to be the king',
-  roomname: 'lobby'
-};
-
 $(document).ready( function() {
-
   app.init();
-
   app.fetch();
-// app.send(message);
 });
-// });
