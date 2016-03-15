@@ -168,7 +168,8 @@ app.addRoom = function(roomName) {
   //if value is addNewRoom, create input field
   if ($('select[name="roomDropDown"]').val() === 'addNewRoom') {
     //create the input field and button to add a new room (use jQuery to dynamically add it)
-        // or create it in the beginning and set its display to hidden and toggle based on button click
+    $('.hidden').toggleClass('hidden');
+      // or create it in the beginning and set its display to hidden and toggle based on button click
     // create on click hander for Add New Room Button
       // inside on click handler
         // protect user input from bad stuff being entered
