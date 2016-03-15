@@ -3,7 +3,8 @@
 var app = {
   server: 'https://api.parse.com/1/classes/messages',
   results: [],
-  rooms: {'lobby': 'lobby'}
+  rooms: {'lobby': 'lobby'},
+  currentRoom: 'lobby'
 
 };
   
@@ -35,6 +36,8 @@ app.displayMessages = function(data) {
     context.rooms[safeRoomname] = safeRoomname;
   });
   console.log(context.rooms);
+
+  //FILTER RESULT BY ROOM
 
 };
 
@@ -68,7 +71,17 @@ app.escapeForHtml = function(string) {
 app.init = function() {
   $('.clearButton').on('click', app.clearMessages);
   $('.addButton').on('click', app.addMessage);
-
+  $('select[name="roomDropDown"]').on('change', function(event) {
+    if ($(this).val() === 'addNewRoom') {
+      $('.add-room-container').toggleClass('hidden');
+    //if different room is selected
+    } else {
+      //display messages for that room
+      //allow user to add message to that room
+      //fetch for room
+    }
+  });
+  $('.addRoomButton').on('click', app.addRoom);
 };
 
 app.send = function(message) {
@@ -163,27 +176,46 @@ app.addMessage = function(message) {
 
 };
 
-app.addRoom = function(roomName) {
+app.addRoom = function() {
 
-  //if value is addNewRoom, create input field
-  if ($('select[name="roomDropDown"]').val() === 'addNewRoom') {
-    //create the input field and button to add a new room (use jQuery to dynamically add it)
-    $('.hidden').toggleClass('hidden');
-      // or create it in the beginning and set its display to hidden and toggle based on button click
-    // create on click hander for Add New Room Button
-      // inside on click handler
-        // protect user input from bad stuff being entered
-        // add new room value to rooms object in app
-
-  }
-
-  console.log(select);
   //get value from input field
-  //add to dropdown menu
+  // protect user input from bad stuff being entered
+  var roomname = app.escapeForHtml($('input[name="addRoom"]').val());
+  //add to rooms object
+  app.rooms[roomname] = roomname;
+  console.log(roomname);
+  //refresh dropdown with rooms object
+  //delete old options
+  $('select[name="roomDropDown"]').empty();
 
+  $('select[name="roomDropDown"]').append($('<option/>', {
+    text: 'Add New Room',
+    value: 'addNewRoom' 
+  }));
+  
 
+  $.each(app.rooms, function(index, value) {
+    if (value === roomname) {
+      //console.log("ROOMNAME == value");
+      $('select').append($('<option/>', {
+        text: value,
+        value: value ,
+        selected: 'selected'
+      }));
+    } else { 
+      $('select').append($('<option/>', {
+        text: value,
+        value: value
+      }));  
+    }
+  });
+  //fetch messages for room
 
+  //add to dropdown list
+  // add new room value to rooms object in app
+  // navigate to room, fetch for that room
 
+  $('.add-room-container').toggleClass('hidden');
 };
 
 
@@ -198,7 +230,6 @@ $(document).ready( function() {
   app.init();
 
   app.fetch();
-  app.addRoom();
 // app.send(message);
 });
 // });
