@@ -5,7 +5,7 @@ body {
     font-family: arial, sans-serif;
 }
 
-#main, #chats {
+#main {
     width: 500px;
     margin: auto;
     text-align: left;
@@ -15,11 +15,24 @@ body {
     border-width: 0 1px 1px 1px;
 }
 
+#chats {
+
+    width: 480px;
+     margin: auto;
+    text-align: left;
+    background: white;
+    padding: 10px 9px;
+    border: solid #ddd;
+    border-width: 0 1px 1px 1px;
+    
+}
+
 #main h1 {
     margin-top: 0;
     font-size: 35px;
     margin-bottom: 5px;
     padding: 5px;
+    font: 3.2rem/1.10 Georgia;
 }
 
 #main h1 span {
@@ -63,6 +76,7 @@ form input[type=text] {
     padding: 5px;
     margin-bottom: 5px;
     background-color: #eee;
+    border-radius: 10px;
 }
 
 .chat .username {
@@ -86,3 +100,31 @@ form input[type=text] {
 .hidden {
     display: none;
 }
+
+button {
+    transition: all, 0.2s, ease;
+    border-radius: 5px;
+}
+
+.addButton, .clearButton {
+    position: relative;
+    float: right;
+    padding: 5px;
+    margin: 5px;
+}
+
+input {
+    width: 200px;
+    padding: 5px;
+    margin: 5px;
+}
+
+select {
+    position: relative;
+    /*float: left;*/
+    width: 250px;
+}
+
+/*option {
+    width: 250px;
+}*/

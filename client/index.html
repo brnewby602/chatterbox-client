@@ -13,26 +13,37 @@
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
   </head>
+
   <body>
+
     <div id="main">
+
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
+      <select name='roomDropDown' id='roomSelect'>
+        <option value='addNewRoom'>Add New Room</option>
+        <option selected='selected' value='lobby'>lobby</option>
+      </select>
+
+      <span class='add-room-container hidden'>
+          <input type='text' name='addRoom' id='message'>
+          <button type='button' class='addRoomButton'>Add New Room</button>
+      </span>
+
+      <div>
+        <button type='button' class='clearButton'>Clear Messages</button>
+        <form action="#" id="send" method="post">
+          <input type='text' name='add'>
+          <button type='submit' class='addButton'>Add Message</button>
+        </form>
+      </div>
+
+      <div id="chats"></div>
     </div>
-    <select name='roomDropDown' id='roomSelect'>
-    
-      <option value='addNewRoom'>Add New Room</option>
-      <option selected='selected' value='lobby'>lobby</option>
-      
-    </select>
-    <span class='add-room-container hidden'>
-      <input type='text' name='addRoom'>
-      <button type='button' class='addRoomButton'>Add New Room</button>
-    </span>
-    <button type='button' class='clearButton'>Clear Messages</button>
-    <input type='text' name='add'>
-    <button type='button' class='addButton'>Add Message</button>
-    <div id="chats"></div>
+
+
     <!-- <input type='select' name='rooms'> -->
+
   </body>
 </html>
 
