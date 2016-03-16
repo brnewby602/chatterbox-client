@@ -101,7 +101,7 @@ form input[type=text] {
     display: none;
 }
 
-button {
+/*button {
     transition: all, 0.2s, ease;
     border-radius: 5px;
 }
@@ -122,8 +122,8 @@ input {
 select {
     position: relative;
     /*float: left;*/
-    width: 250px;
-}
+/*    width: 250px;
+}*/
 
 .bold {
     font-weight: 800;

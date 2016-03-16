@@ -9,7 +9,6 @@ var app = {
   
 app.displayMessages = function(data) {
 
-console.log("DATA = " + data);
   var $chats = $('#chats');
   var context = this;
 
@@ -28,35 +27,30 @@ console.log("DATA = " + data);
     var safeUsername = context.escapeForHtml(username);
     var safeRoomname = context.escapeForHtml(roomname);
 
+    // we need to get the value of the Rooms dropdown to check if "All Rooms" is chosen
+    var allrooms = $('select[name="roomDropDown"]').val();
 
-    if (safeRoomname === context.currentRoom) {
+    //if the room is our current room OR if the dropdown is set to all rooms
+    if (safeRoomname === context.currentRoom || allrooms === 'allRooms') {
 
-      // var element = $("<div></div>").data(safeUsername);
+      // var style = '';
+      // if (context.friends[safeUsername]) {
+      //   style = 'bold';
+      // }
 
-      console.log("friend = " + context.friends);
-      var style = '';
-      if (context.friends[safeUsername]) {
-        style = 'bold';
-      }
-
-
-
-      var temp = '<div class="chat" ' + style + '> ' +
+      var temp = '<div class="chat"> ' +
             '<div class="username">' + safeUsername + '</div>' +
             '<div>' + safeText + '</div>' + '\n' + 
             '<div>' + safeCreatedAt + '</div>' +
             '</div>';    
 
-
       $chats.append(temp);
-      // $('.chat').data(safeUsername);
-
     }
+
 
     context.rooms[safeRoomname] = safeRoomname;
 
   });
-
 };
 
 //TRY REGEX LATER
@@ -110,7 +104,7 @@ app.init = function() {
       context.currentRoom = $(this).val();
 
       // hide Add Room input text and button if it is being displayed
-      $('.add-room-container').addClass('hidden');
+      // $('.add-room-container').addClass('hidden');
 
       app.fetch();
     }
@@ -124,13 +118,9 @@ app.init = function() {
 
   // Clicking on a user name event handler
   $('#main').on('click', '.username', function() {
-
-    // console.dir($(this));
     var newFriend = $(this).text();
-
-    console.log("newFriend = " + newFriend);
+    console.log('newFriend: ' + newFriend);
     app.addFriend(newFriend);
-  
   });
 
 };
@@ -167,6 +157,7 @@ app.fetch = function() {
       context.results = data.results;
       context.displayMessages(data.results);
       var roomName = context.currentRoom || "Home";
+      console.log("ROOM = " + roomName);
       context.initRoom(roomName);
       console.log('chatterbox: Message received');
     },
@@ -223,16 +214,11 @@ app.addRoom = function(room) {
   var roomname = app.escapeForHtml(room);
   //add to rooms object
   app.rooms[roomname] = roomname;
+  app.currentRoom = roomname;
   //refresh dropdown with rooms object
   //delete old options
-  $('select[name="roomDropDown"]').empty();
 
-  $('select[name="roomDropDown"]').append($('<option/>', {
-    text: 'Add New Room',
-    value: 'addNewRoom' 
-  }));
-
-  app.initRoom(roomname);
+  //app.initRoom(roomname);
 
   //fetch messages for room
   app.fetch();
@@ -241,7 +227,21 @@ app.addRoom = function(room) {
 };
 
 app.initRoom = function(roomname) {
-  app.currentRoom = roomname || 'Home';
+  $('select[name="roomDropDown"]').empty();
+
+  $('select[name="roomDropDown"]').append($('<option/>', {
+    text: 'Add New Room',
+    value: 'addNewRoom' 
+  }));
+
+  $('select[name="roomDropDown"]').append($('<option/>', {
+    text: 'All Rooms',
+    value: 'allRooms' 
+  }));
+
+
+ 
+  app.currentRoom = roomname || 'Home';  //allRooms
 
   $.each(app.rooms, function(index, value) {
     if (value === roomname) {
