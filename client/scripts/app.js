@@ -1,5 +1,4 @@
 // YOUR CODE HERE:
-// $(document).ready(function() {
 var app = {
   server: 'https://api.parse.com/1/classes/messages',
   results: [],
@@ -10,12 +9,13 @@ var app = {
   
 app.displayMessages = function(data) {
 
+console.log("DATA = " + data);
   var $chats = $('#chats');
   var context = this;
 
-  //empty chats
   $('#chats').empty();
 
+  //for each message from server, display username, text, and time, append to chats div element
   data.forEach(function(element) { //WHY IS UNDERSCORE NOT WORKING?
 
     var username = element.username;
@@ -28,15 +28,28 @@ app.displayMessages = function(data) {
     var safeUsername = context.escapeForHtml(username);
     var safeRoomname = context.escapeForHtml(roomname);
 
+
     if (safeRoomname === context.currentRoom) {
 
-      var temp = '<div class="chat"> ' +
+      // var element = $("<div></div>").data(safeUsername);
+
+      console.log("friend = " + context.friends);
+      var style = '';
+      if (context.friends[safeUsername]) {
+        style = 'bold';
+      }
+
+
+
+      var temp = '<div class="chat" ' + style + '> ' +
             '<div class="username">' + safeUsername + '</div>' +
             '<div>' + safeText + '</div>' + '\n' + 
             '<div>' + safeCreatedAt + '</div>' +
             '</div>';    
 
+
       $chats.append(temp);
+      // $('.chat').data(safeUsername);
 
     }
 
@@ -112,8 +125,11 @@ app.init = function() {
   // Clicking on a user name event handler
   $('#main').on('click', '.username', function() {
 
-    // $(this)
-    app.addFriend();
+    // console.dir($(this));
+    var newFriend = $(this).text();
+
+    console.log("newFriend = " + newFriend);
+    app.addFriend(newFriend);
   
   });
 
@@ -122,7 +138,7 @@ app.init = function() {
 app.send = function(message) {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
-    url: 'https://api.parse.com/1/classes/messages/',
+    url: 'https://api.parse.com/1/classes/messages',
     type: 'POST',
     data: JSON.stringify(message),
     contentType: 'application/json',
@@ -148,10 +164,10 @@ app.fetch = function() {
     data: '',
     contentType: 'application/json',
     success: function (data) {
-      this.results = data.results;
+      context.results = data.results;
       context.displayMessages(data.results);
       var roomName = context.currentRoom || "Home";
-      context.initRoom();
+      context.initRoom(roomName);
       console.log('chatterbox: Message received');
     },
     error: function (data) {
@@ -243,11 +259,22 @@ app.initRoom = function(roomname) {
   });
 };
 
-app.addFriend = function() {
-  console.log('friends!');
+app.addFriend = function(friend) {
+
+  app.friends[friend] = friend;
+  //console.dir(app.friends);
+  // app.displayMessages(app.results);
+
+  // console.log("friend = " + friend);
+  var elem = $('.chat:contains("' + friend + '")');
+  // console.dir(elem);
+  elem.addClass('bold');
+  //console.log('friends!');
+
 };
 
-app.handleSubmit = function() {
+app.handleSubmit = function(evt) {
+  evt.preventDefault();
   app.addMessage();
 };
 
