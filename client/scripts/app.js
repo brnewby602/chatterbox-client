@@ -122,6 +122,9 @@ app.init = function() {
     console.log('newFriend: ' + newFriend);
     app.addFriend(newFriend);
   });
+  setInterval(function() {
+    app.fetch.call(app);
+  }, 1000);
 
 };
 
@@ -146,6 +149,8 @@ app.send = function(message) {
 app.fetch = function() {
 
   var context = this;
+
+  console.dir(this);
 
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
@@ -283,4 +288,7 @@ $(document).ready( function() {
   app.fetch();
   //refresh room list
   // app.initRoom();
+  // setInterval(function() {
+  //   app.fetch.call(app);
+  // }, 1000);
 });
