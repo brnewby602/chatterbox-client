@@ -84,11 +84,7 @@ app.init = function() {
 
   var context = this;
   $('.clearButton').on('click', app.clearMessages);
-  // $('#send').submit(function(e) {
-  //   console.log('inside submit addButton');
-  //   e.preventDefault();
-  //   context.handleSubmit();
-  // });
+
 
   $('#send').submit(app.handleSubmit);
 
@@ -102,10 +98,6 @@ app.init = function() {
       //allow user to add message to that room
       //fetch for room
       context.currentRoom = $(this).val();
-
-      // hide Add Room input text and button if it is being displayed
-      // $('.add-room-container').addClass('hidden');
-
       app.fetch();
     }
   });
@@ -220,10 +212,6 @@ app.addRoom = function(room) {
   //add to rooms object
   app.rooms[roomname] = roomname;
   app.currentRoom = roomname;
-  //refresh dropdown with rooms object
-  //delete old options
-
-  //app.initRoom(roomname);
 
   //fetch messages for room
   app.fetch();
@@ -243,8 +231,6 @@ app.initRoom = function(roomname) {
     text: 'All Rooms',
     value: 'allRooms' 
   }));
-
-
  
   app.currentRoom = roomname || 'Home';  //allRooms
 
@@ -267,15 +253,8 @@ app.initRoom = function(roomname) {
 app.addFriend = function(friend) {
 
   app.friends[friend] = friend;
-  //console.dir(app.friends);
-  // app.displayMessages(app.results);
-
-  // console.log("friend = " + friend);
   var elem = $('.chat:contains("' + friend + '")');
-  // console.dir(elem);
   elem.addClass('bold');
-  //console.log('friends!');
-
 };
 
 app.handleSubmit = function(evt) {
@@ -286,9 +265,4 @@ app.handleSubmit = function(evt) {
 $(document).ready( function() {
   app.init();
   app.fetch();
-  //refresh room list
-  // app.initRoom();
-  // setInterval(function() {
-  //   app.fetch.call(app);
-  // }, 1000);
 });
